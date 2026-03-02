@@ -1,0 +1,25 @@
+# Sort configuration for XML elements
+# Structure: container_tag -> child_tag -> sort fields (list) OR nested spec (dict)
+# - List of field names: sort direct children with that tag by those fields (child text or @attr for attributes).
+# - Dict: apply spec to the first direct child with that tag (recursive).
+#
+# Top-level key must be a direct child of the document root (e.g. "sequences" under <acquisition-configuration>).
+
+acquisition-configuration:
+  sequences:
+    # Sort <sequence> elements under <sequences> by <name>
+    sequence:
+      - name
+    # Nested: sort <sequence-function> inside <sequence-functions> by <order> then <name>
+    # Note: "sequence-functions" is not a direct child of "sequences" in the XML;
+    # it lives inside each "sequence". So this block runs only if the script is extended
+    # to apply nested specs per "sequence" (e.g. for each sequence, then its sequence-functions).
+    sequence-functions:
+      sequence-function:
+        - order
+        - name
+
+base-configuration:
+  external-connectors:
+    external-connector:
+      - name

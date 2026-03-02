@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<acquisition-configuration version="2.4">
+	<sequences>
+		<sequence application="Sample">
+			<name>Alpha</name>
+			<sequence-functions>
+				<sequence-function><order>2</order><name>B</name></sequence-function>
+				<sequence-function><order>1</order><name>A</name></sequence-function>
+			</sequence-functions>
+		</sequence>
+		<sequence application="Sample">
+			<name>Beta</name>
+		</sequence>
+	<sequence application="Sample">
+			<name>Zebra</name>
+			<sequence-functions>
+				<sequence-function><order>3</order><name>Third</name></sequence-function>
+				<sequence-function><order>1</order><name>First</name></sequence-function>
+				<sequence-function><order>2</order><name>Second</name></sequence-function>
+			</sequence-functions>
+		</sequence>
+		</sequences>
+</acquisition-configuration>
