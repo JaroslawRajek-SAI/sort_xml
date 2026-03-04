@@ -3,16 +3,20 @@
 sort_xml - Sort XML elements according to a YAML configuration file.
 
 Usage: python sort_xml.py <xml_file> [config_file]
-  xml_file    - Path to the XML file to sort
+  xml_file    - Path to the XML file to sort (relative to documents/ or absolute)
   config_file - Path to YAML config (default: config.yml)
 
-Output: Creates <xml_file>_sorted.xml with elements sorted as defined in config.
+All document paths are relative to the "documents" subfolder next to the script.
+Output: Creates <xml_file>_sorted.xml in documents/.
 """
 
 import argparse
 import re
 import sys
 from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+DOCUMENTS_DIR = SCRIPT_DIR / "documents"
 
 try:
     import yaml
@@ -127,44 +131,55 @@ def main() -> None:
     parser.add_argument(
         "xml_file",
         type=Path,
-        help="Path to the XML file to sort",
+        help="XML file to sort (path relative to documents/ or absolute)",
     )
     parser.add_argument(
         "config_file",
         type=Path,
         nargs="?",
         default=Path("config.yml"),
-        help="Path to YAML config file (default: config.yml)",
+        help="YAML config file (default: config.yml next to script)",
     )
     parser.add_argument(
         "-o", "--output",
         type=Path,
         default=None,
-        help="Output file path (default: <xml_file>_sorted.xml)",
+        help="Output path (default: <xml_file>_sorted.xml in documents/)",
     )
     args = parser.parse_args()
 
-    if not args.xml_file.exists():
-        print(f"Error: XML file not found: {args.xml_file}", file=sys.stderr)
+    # Resolve paths: documents (XML in/out) live in documents/ subfolder
+    xml_path = args.xml_file if args.xml_file.is_absolute() else DOCUMENTS_DIR / args.xml_file
+    config_path = args.config_file if args.config_file.is_absolute() else SCRIPT_DIR / args.config_file
+    if args.output is not None and not args.output.is_absolute():
+        out_path = DOCUMENTS_DIR / args.output
+    else:
+        out_path = args.output
+
+    if not xml_path.exists():
+        print(f"Error: XML file not found: {xml_path}", file=sys.stderr)
         sys.exit(1)
-    if not args.config_file.exists():
-        print(f"Error: Config file not found: {args.config_file}", file=sys.stderr)
+    if not config_path.exists():
+        print(f"Error: Config file not found: {config_path}", file=sys.stderr)
         sys.exit(1)
 
-    config = load_config(args.config_file)
+    DOCUMENTS_DIR.mkdir(parents=True, exist_ok=True)
+
+    config = load_config(config_path)
     if not config:
         print("Error: Config is empty.", file=sys.stderr)
         sys.exit(1)
 
     if _PARSER is not None:
-        tree = ET.parse(args.xml_file, _PARSER)
+        tree = ET.parse(xml_path, _PARSER)
     else:
-        tree = ET.parse(args.xml_file)
+        tree = ET.parse(xml_path)
     root = tree.getroot()
 
     apply_config(root, config)
 
-    out_path = args.output or args.xml_file.with_stem(args.xml_file.stem + "_sorted")
+    if out_path is None:
+        out_path = xml_path.with_stem(xml_path.stem + "_sorted")
     if _PARSER is not None:
         tree.write(
             out_path,

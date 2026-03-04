@@ -1,6 +1,6 @@
 # sort_xml
 
-Sort XML elements according to a YAML configuration. Output is written to a new file (by default `<name>_sorted.xml`).
+Sort XML elements according to a YAML configuration. All document paths are relative to the **documents** subfolder (next to the script). Output is written there by default as `<name>_sorted.xml`.
 
 **Requirements:** Python 3, PyYAML (`pip install pyyaml`). For **CDATA preservation**, lxml is used when available (`pip install lxml`); otherwise the standard library is used and CDATA sections become escaped text.
 
@@ -10,17 +10,17 @@ Sort XML elements according to a YAML configuration. Output is written to a new 
 python sort_xml.py <xml_file> [config_file] [-o output_file]
 ```
 
-- **xml_file** — XML file to sort (required)
-- **config_file** — YAML config (optional; default: `config.yml`)
-- **-o, --output** — Output path (optional; default: `<xml_file>_sorted.xml`)
+- **xml_file** — XML file to sort (path relative to `documents/` or absolute)
+- **config_file** — YAML config (optional; default: `config.yml` next to script)
+- **-o, --output** — Output path (optional; default: `<xml_file>_sorted.xml` in `documents/`)
 
 ### Examples
 
 ```bash
-# Use default config.yml in current directory
+# From the sort_xml folder: input documents/POLITIET_services-configuration.xml, output documents/POLITIET_services-configuration_sorted.xml
 python sort_xml.py POLITIET_services-configuration.xml
 
-# Specify config and output file
+# Custom output name in documents/
 python sort_xml.py POLITIET_services-configuration.xml config.yml -o result.xml
 ```
 
